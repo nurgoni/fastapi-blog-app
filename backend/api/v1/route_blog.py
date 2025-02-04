@@ -38,3 +38,13 @@ def update_blog(id: int, blog: UpdateBlog, db: Session = Depends(get_db)):
             detail=f"Blog with id {id} does not exist"
         )
     return blog
+
+@router.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_blog(id: int, db: Session = Depends(get_db)):
+    message = delete_blog(id=id, author_id=1, db=db)
+    if message.get("error"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=message.get("error")
+        )
+    return {"message": f"Successfully deleted blog with id {id}"}

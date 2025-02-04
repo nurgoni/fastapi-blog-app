@@ -43,3 +43,14 @@ def update_blog(id: int, blog: UpdateBlog, author_id: int, db: Session):
     db.commit()
 
     return blog_in_db
+
+def delete_blog(id: int, author_id: int, db: Session):
+    blog_in_db = db.query(Blog).filter(Blog.id == id).first()
+
+    if not blog_in_db:
+        return {"error": f"Blog with id {id} does not exist"}
+
+    blog_in_db.delete()
+    db.commit()
+
+    return {"message": f"Successfully deleted blog with id {id}"}
