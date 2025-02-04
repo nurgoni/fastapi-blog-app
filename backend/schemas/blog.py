@@ -23,3 +23,5 @@ class ShowBlog(BaseModel):
     class Config():
         from_attributes = True
 
+class UpdateBlog(CreateBlog):
+    pass
