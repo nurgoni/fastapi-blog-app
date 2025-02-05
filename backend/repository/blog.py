@@ -34,7 +34,9 @@ def update_blog(id: int, blog: UpdateBlog, author_id: int, db: Session):
     blog_in_db = db.query(Blog).filter(Blog.id == id).first()
 
     if not blog_in_db:
-        return None
+        return {"error": f"Blog with id {id} does not exist"}
+    if not blog_in_db.author_id == author_id:
+        return {"error": f"Only the author can modify the blog"}
 
     blog_in_db.title = blog.title
     blog_in_db.content = blog.content
@@ -49,6 +51,8 @@ def delete_blog(id: int, author_id: int, db: Session):
 
     if not blog_in_db:
         return {"error": f"Blog with id {id} does not exist"}
+    if not blog_in_db.author_id == author_id:
+        return {"error": f"Only the author can delete a blog"}
 
     blog_in_db.delete()
     db.commit()

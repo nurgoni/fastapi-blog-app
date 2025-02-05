@@ -4,8 +4,11 @@ from fastapi import Depends
 from typing import List
 
 from db.session import get_db
+from db.models import User
 from schemas.blog import ShowBlog, CreateBlog, UpdateBlog
 from repository.blog import create_new_blog, retrieve_blog, list_blogs
+
+from api.v1.route_login import get_current_user
 
 router = APIRouter()
 
@@ -30,8 +33,8 @@ async def get_all_blogs(db: Session = Depends(get_db)):
     return blogs
 
 @router.put("/blog/{id}", response_model=ShowBlog)
-def update_blog(id: int, blog: UpdateBlog, db: Session = Depends(get_db)):
-    blog = update_blog(id=id, blog=blog, author_id=1, db=db)
+def update_blog(id: int, blog: UpdateBlog, db: Session = Depends(get_db), current_user: User=Depends(get_current_user)):
+    blog = update_blog(id=id, blog=blog, author_id=current_user.id, db=db)
     if not blog:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
@@ -40,8 +43,8 @@ def update_blog(id: int, blog: UpdateBlog, db: Session = Depends(get_db)):
     return blog
 
 @router.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_blog(id: int, db: Session = Depends(get_db)):
-    message = delete_blog(id=id, author_id=1, db=db)
+def delete_blog(id: int, db: Session = Depends(get_db), current_user: User=Depends(get_current_user)):
+    message = delete_blog(id=id, author_id=current_user.id, db=db)
     if message.get("error"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, 
